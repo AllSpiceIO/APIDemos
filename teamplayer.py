@@ -13,56 +13,40 @@ gitea = Gitea(URL, TOKEN)
 print("Gitea Version: " + gitea.get_version())
 print("API-Token belongs to user: " + gitea.get_user().username)
 
+def getAllOrgTeams(organization):
+
+    teamlist = organization.get_teams()
+    for team in teamlist:
+        teamLog  = organization.name + ", "
+        teamLog += team.name + ", "
+        teamLog += str(team.units_map) + ", "
+        teamLog += "["
+
+        teamMemberList = team.get_members()
+        for teamMember in teamMemberList:
+            teamLog += teamMember.email + ","
+        
+        # trim the final comma ","
+        teamLog = teamLog.rstrip(teamLog[-1])
+        teamLog += "]"
+        print(teamLog)
+    
+    return
+
+
 # get organization names
 organizations = gitea.get_orgs()
 
 # process all organizations on site
-organization = organizations[3]
-# for organization in organizations:
-if(1):   
-    # debug
-    print(organization.name)
-    
-    # get all repos
-    OrganizationRepos = organization.get_repositories()
+# organization = organizations[3]
+for organization in organizations:
+# if(1):   
+   getAllOrgTeams(organization)
 
-    teamlist = organization.get_teams()
-    for team in teamlist:
-        # print("teamname, " + team.name + ", units" + str(sorted(team.units)) )
-        # teamMemberList = team.get_members()
 
-        print(team.permission)
-        # for unit in team.units:
-        #     print(unit)
 
-        print(team.units_map)
-        print(team.units_map['repo.code'])
-        for unitmap in team.units_map:
-            print(team.units_map[unitmap])
-
-        teamMemberList = team.get_members()
-        for teamMember in teamMemberList:
-            print("team: " + team.name + ", member: " + teamMember.email)
-    
-    # process all repositories in an organization
-    # for repo in OrganizationRepos:
-        
-    #     # debug
-    #     print(repo.get_full_name())
-
-    #     # process all branches
-    #     repoBranches = repo.get_branches()
-    #     print("branchCount, " + str(len(repoBranches)))
-
-    #     commitCount = 0
-    #     # for branch in repoBranches:
-    #     #     print("branchName, " + branch.__getattribute__("name"))
-          
-    #     #     #print("branch, " + branch )
-
-    #     # count all commits
-    #     repoCommits = repo.get_commits()
-
-        
+### reference
+        # for unitmap in team.units_map:
+        #     print(team.units_map[unitmap])  
 
 
