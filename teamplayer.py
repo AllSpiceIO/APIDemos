@@ -4,7 +4,10 @@
 
 
 import os
-from gitea import *
+# from gitea import *
+
+# Importing locally from /gitea/gitea/, not the installed py-gitea api
+from gitea.gitea import *
 
 from src.team import Team
 
@@ -48,20 +51,17 @@ def getAllOrgTeams(organization):
 # teamlist
 orgsToMod = ["UtilityTesting"]
 teamList = []
-teamList.append( Team("teamFoo", 
-                        {
-                            "repo.code": "write",
-                            "repo.ext_issues": "write",
-                            "repo.ext_wiki": "write",
-                            "repo.issues": "write",
-                            "repo.projects": "write",
-                            "repo.pulls": "write",
-                            "repo.releases": "write",
-                            "repo.wiki": "write"
-                        },
-                        ["email1@domain.com", "email2@domain.com"]))
 
-teamList.append( Team("teamBar", 
+
+readWrite = "write"
+canCreateOrgRepo = True
+includesAllRepos = True
+
+teamList.append( Team("Owners",
+                        "Owners of the org",
+                        readWrite,
+                        canCreateOrgRepo,
+                        includesAllRepos,
                         {
                             "repo.code": "write",
                             "repo.ext_issues": "write",
@@ -71,8 +71,46 @@ teamList.append( Team("teamBar",
                             "repo.pulls": "write",
                             "repo.releases": "write",
                             "repo.wiki": "write"
-                        },
-                        ["email3@domain.com", "email4@domain.com", "email5@domain.com"]))
+                        }, 
+                        ["daniel@allspice.io", "daniel+test2@allspice.io"]))
+
+canCreateOrgRepo = False
+readWrite = "read"
+teamList.append( Team("Collaborators", 
+                        "Can read and participate in design reviews",
+                        readWrite,
+                        canCreateOrgRepo,
+                        includesAllRepos,
+                        {
+                            "repo.code": "read",
+                            "repo.ext_issues": "none",
+                            "repo.ext_wiki": "none",
+                            "repo.issues": "read",
+                            "repo.projects": "read",
+                            "repo.pulls": "read",
+                            "repo.releases": "read",
+                            "repo.wiki": "read"
+                        }, 
+                        ["daniel+revareviewa@allspice.io", "daniel+mikachanical@allspice.io"]))
+
+canCreateOrgRepo = True
+readWrite = "write"
+teamList.append( Team("Contributors", 
+                        "write acceess to team repos",
+                        readWrite,
+                        canCreateOrgRepo,
+                        includesAllRepos,
+                        {
+                            "repo.code": "write",
+                            "repo.ext_issues": "write",
+                            "repo.ext_wiki": "write",
+                            "repo.issues": "write",
+                            "repo.projects": "write",
+                            "repo.pulls": "write",
+                            "repo.releases": "write",
+                            "repo.wiki": "write"
+                        }, 
+                        ["daniel@allspice.io", "daniel+mikachanical@allspice.io"]))
 
 
 
@@ -94,9 +132,32 @@ for organization in organizations:
         #getAllOrgTeams(organization)
         # setOrgTeam(organization
 
-        # for team in teamList:
-        gitea.create_team(organization, "team31", "team12", "read", True, True)
+        for team in teamList:
+            units=(
+                        "repo.code",
+                        "repo.issues",
+                        "repo.ext_issues",
+                        "repo.wiki",
+                        "repo.pulls",
+                        "repo.releases",
+                        "repo.ext_wiki",
+                )
+            units_map = team.units_map
+            teamToMod = organization.get_team(team.name)
+            print(f'team.readWrite, {team.readWrite}')
+            if (teamToMod == None):
+                teamToMod = gitea.create_team(organization, team.name, team.description, team.readWrite, team.canCreateOrgRepo, team.includesAllRepos, units, units_map)
+                # teamToMod = gitea.create_team(organization, team.name, "teamdesc", "write", True, True, units, units_map)
+                # teamToMod = gitea.create_team(organization, team.name, team.description, team.readWrite, True, True, units, units_map)
+                # print(f'team.readWrite, {team.readWrite}')
+                # teamToMod = gitea.create_team(organization, team.name, team.description, "write", True, True, units, units_map)
+                
 
+            # Add usernames to team
+            for email in team.memberEmails:
+                user = gitea.get_user_by_email(email)
+                if teamToMod is not None:
+                    teamToMod.add_user(user)
 
 
 
