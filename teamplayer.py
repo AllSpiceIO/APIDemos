@@ -1,6 +1,5 @@
 # Based on https://github.com/Langenfeld/py-gitea
 
-# Use prepopulated team member and org lists to spoof file read and speed up development
 
 
 import os
@@ -9,54 +8,40 @@ import os
 # Importing locally from /gitea/gitea/, not the installed py-gitea api
 from gitea.gitea import *
 
+# helper class, different than gitea.teams, should merge
 from src.team import Team
 
-import pprint
+# Load URL and access token from environmental variables
+try:
+    URL = os.environ['ALLSPICE_URL']
+    # URL = "https://allspice.dev"
+except:
+    print('ALLSPICE_URL is None, run >export ALLSPICE_URL="https://allspice.dev"')
+    quit()
 
-TOKEN = "90667459ce8f5e7c1546d2de04577712ce0abc0e"
-URL = "https://allspice.dev"
+
+try:
+    TOKEN = os.environ['ALLSPICE_ACCESS_TOKEN']
+except:
+    print (f'ALLSPICE_ACCESS_TOKEN is None, run >export ALLSPICE_ACCESS_TOKEN="token", create token at {URL}/user/settings/applications')
+    quit()
+
+
+# create website object  
 gitea = Gitea(URL, TOKEN)
 
-print("Gitea Version: " + gitea.get_version())
-print("API-Token belongs to user: " + gitea.get_user().username)
+# -----------------------------------------------------
+# Setup
+
+# Create list of organizations to modify
+orgsToMod = ["UtilityTesting", "ExampleOrganization"]
 
 
-
-def setOrgTeam(organization):
-   
-    return
-
-def getAllOrgTeams(organization):
-
-    teamlist = organization.get_teams()
-    for team in teamlist:
-        teamLog  = organization.name + ", "
-        teamLog += team.name + ", "
-        teamLog += str(team.units_map) + ", "
-        teamLog += "["
-
-        teamMemberList = team.get_members()
-        for teamMember in teamMemberList:
-            teamLog += teamMember.email + ","
-        
-        # trim the final comma ","
-        teamLog = teamLog.rstrip(teamLog[-1])
-        teamLog += "]"
-        print(teamLog)
-    
-    return
-
-
-
-# teamlist
-orgsToMod = ["UtilityTesting"]
-teamList = []
-
-
+# Create teams
 readWrite = "write"
 canCreateOrgRepo = True
 includesAllRepos = True
-
+teamList = []
 teamList.append( Team("Owners",
                         "Owners of the org",
                         readWrite,
@@ -112,57 +97,45 @@ teamList.append( Team("Contributors",
                         }, 
                         ["daniel@allspice.io", "daniel+mikachanical@allspice.io"]))
 
+# permission units, associated with units_map
+units=(
+            "repo.code",
+            "repo.issues",
+            "repo.ext_issues",
+            "repo.wiki",
+            "repo.pulls",
+            "repo.releases",
+            "repo.ext_wiki",
+    )
 
 
-for team in teamList:
-    print(team.__str__())
+# --------------------------------------------------
+# Start script
 
-# get organization names
+print("TeamPlayer python script")
+print("Gitea Version: " + gitea.get_version())
+print("API-Token belongs to user: " + gitea.get_user().username)
+
+
+# get all organization names
 organizations = gitea.get_orgs()
 
 # process all organizations on site
-organization = organizations[3]
 for organization in organizations:
-# if(1):   
-#    getAllOrgTeams(organization)
-    print("foo")
 
     if organization.name in orgsToMod:
-        print(f'modifyOrg, {organization.name}')
-        #getAllOrgTeams(organization)
-        # setOrgTeam(organization
+        print(f'Modifying organization, {organization.name}')
 
         for team in teamList:
-            units=(
-                        "repo.code",
-                        "repo.issues",
-                        "repo.ext_issues",
-                        "repo.wiki",
-                        "repo.pulls",
-                        "repo.releases",
-                        "repo.ext_wiki",
-                )
             units_map = team.units_map
             teamToMod = organization.get_team(team.name)
-            print(f'team.readWrite, {team.readWrite}')
+            print(f'Modifying organization: {organization.name}, adding team: {team.name}')
             if (teamToMod == None):
-                teamToMod = gitea.create_team(organization, team.name, team.description, team.readWrite, team.canCreateOrgRepo, team.includesAllRepos, units, units_map)
-                # teamToMod = gitea.create_team(organization, team.name, "teamdesc", "write", True, True, units, units_map)
-                # teamToMod = gitea.create_team(organization, team.name, team.description, team.readWrite, True, True, units, units_map)
-                # print(f'team.readWrite, {team.readWrite}')
-                # teamToMod = gitea.create_team(organization, team.name, team.description, "write", True, True, units, units_map)
-                
+                teamToMod = gitea.create_team(organization, team.name, team.description, team.readWrite, team.canCreateOrgRepo, team.includesAllRepos, units, units_map)            
 
-            # Add usernames to team
+            # Add users to team
             for email in team.memberEmails:
                 user = gitea.get_user_by_email(email)
                 if teamToMod is not None:
                     teamToMod.add_user(user)
-
-
-
-### reference
-        # for unitmap in team.units_map:
-        #     print(team.units_map[unitmap])  
-
 
