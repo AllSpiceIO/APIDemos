@@ -5,58 +5,28 @@
 # Hello World starts you out easy with some simple server requests.
 # This will help you troubleshoot your connection and show you the basics of making an api request
 
+import sys
+sys.path.append('..')
+from allspice.allspice import AllSpice
+allspice = AllSpice()
+allspice.start()
 
-import logging
-import os
-
-# importing Py-gitea
-# https://github.com/Langenfeld/py-gitea
-from gitea import *
-
-
-# Load URL and access token from environmental variables
+versionResponse = ""
 try:
-    URL = os.environ['ALLSPICE_URL']
-    # URL = "https://allspice.dev"
+    versionResponse = allspice.hub.get_version()
 except:
-    logging.error(f'ALLSPICE_URL is None, run >export ALLSPICE_URL="yourURL"')
+    allspice.log.error(f'failure to gitea.get_version()')
     quit()
 
+allspice.log.info(f'Allspice Version: {versionResponse}')
 
+username = ""
 try:
-    TOKEN = os.environ['ALLSPICE_ACCESS_TOKEN']
+    username = allspice.hub.get_user().username
 except:
-    loggin.error(f'ALLSPICE_ACCESS_TOKEN is None, run >export ALLSPICE_ACCESS_TOKEN="token", create token at {URL}/user/settings/applications')
+    allspice.log.error('User authentication invalid')
     quit()
 
+allspice.log.info(f'API-Token belongs to user: {username}')
 
-# create website object  
-gitea = Gitea(URL, TOKEN)
-
-LOGLEVEL = os.environ.get('LOGLEVEL', 'INFO').upper()
-logging.basicConfig(level=LOGLEVEL, format='%(asctime)s %(levelname)s: %(message)s', datefmt='%Y-%m-%dT%H:%M:%S')
-
-
-# --------------------------------------------------
-# Start script
-
-logging.info("Hello world test script")
-
-logging.info(f'Gitea Version: {gitea.get_version()}')
-
-
-
-username = gitea.get_user().username
-logging.info(f'get_user().username={username}')
-try:
-    username = gitea.get_user().username
-except:
-    logging.error('User authentication invalid')
-    quit()
-
-logging.info(f'API-Token belongs to user: {username}')
-
-
-# get all organization names
-organizations = gitea.get_orgs()
 
