@@ -11,7 +11,8 @@ import sys
 sys.path.append('..')
 from allspice_proto.allspice_proto import AllSpice_Proto
 allspice = AllSpice_Proto()
-allspice.start()
+if (allspice.start() is False):
+    quit()
 
 
 # helper class, different than gitea.teams, should merge
@@ -29,8 +30,7 @@ teamList = []
 
 
 import argparse
-parser = argparse.ArgumentParser(prog = __file__, description='Changes name of team')
-# parser.parse_args()
+parser = argparse.ArgumentParser(prog = __file__, description='adds or modifies teams')
 parser.add_argument('filename')
 args = parser.parse_args()
 
@@ -55,14 +55,22 @@ with open(args.filename, 'r') as file:
 
 # Vaguely check for json parsing failure
 if (    teamsToMod                  is None or
-        teamsToMod['teamsToModify'] is None
+        teamsToMod['teamsToModify'] is None or
+        teamsToMod['orgsToModify']  is None
     ):
     allspice.log.error(f'Can\'t parse filename {args.filename}', teamsToMod={teamsToMod})
     quit()
 
 allspice.log.info(f'{__file__}, {allspice.URL} python script')
 
-orgs = allspice.hub.get_orgs();
+orgs = None
+try:
+    orgs = allspice.hub.get_orgs();
+    
+except: 
+    allspice.log.error(f'failure on orgs = allspice.hub.get_orgs() - check permission')
+    quit()
+
 orgnames = []
 orgDict = {}
 DEBUG_GET_ORGS = False
@@ -71,68 +79,102 @@ if (DEBUG_GET_ORGS):
 for org in orgs:
     orgDict[org.name] = org
     orgnames.append(org.name)
+
+for orgMod in teamsToMod['orgsToModify']:
+    if orgMod not in orgnames:
+        allspice.log.error(f'orgMod = {orgMod} not in organization list on server')
     
 DEBUG_ORG_NAMES = False
 if DEBUG_ORG_NAMES:
      allspice.log.info(f'orgs={orgs}')
 
 
+# permission units, associated with units_map
+units=(
+            "repo.code",
+            "repo.issues",
+            "repo.ext_issues",
+            "repo.wiki",
+            "repo.pulls",
+            "repo.releases",
+            "repo.ext_wiki",
+    )
 
 
-# For each of the teamsToModify objects in the json file
-for teamMods in teamsToMod['teamsToModify']:
-    
-    # Log team dict object
-    DEBUG_TEAMNAME = False
-    if DEBUG_TEAMNAME:
-        allspice.log.info(f'teamMods={teamMods}')
 
-    # verify org from file is in list of orgs from server
-    orgname = teamMods['organization']
-    if orgname not in orgnames:
-        allspice.log.error(f'org does not exist = {orgname}')
-        quit()
-    
-    # get organization's teams and check to see if oldTeamName is a team
-    newTeamName = teamMods['newTeamName']
-    thisorg = None
-    theseTeams = None
-    newTeamOnServer = False
-    oldTeamOnServer = False
-    oldTeamname = teamMods['oldTeamName']
-    teamID = 0
-    try:
-        thisorg = orgDict[orgname]
-        theseTeams = thisorg.get_teams()
-        for thisTeam in theseTeams:
-            if thisTeam.name == oldTeamname:
-                oldTeamOnServer = True
-                teamID = thisTeam.id
-            if thisTeam.name == newTeamName:
-                newTeamOnServer = True
-    except:
-        allspice.log.error(f'error {orgname}.getTeams()')
-        quit()
 
-    # Check for errorsd
-    if  (   oldTeamOnServer is False or 
-            newTeamOnServer is True or
-            teamID == 0 or
-            newTeamName is None
-    
-    ):
-        allspice.log.error(f'error {orgname}.getTeams(), oldTeamname = {oldTeamname} on server = {oldTeamOnServer}, newTeamname = {newTeamName} on server = {newTeamOnServer} ')
-        quit()
+for orgname in teamsToMod['orgsToModify']:
 
-    # setup https post parameters to modify team
-    params = { 'name' : newTeamName }
-
-    # Tell the server we want to modify the team with the new name
-    try:
+    # For each of the teamsToModify objects in the json file
+    for teamMods in teamsToMod['teamsToModify']:
+        
+        # Log team dict object
+        DEBUG_TEAMNAME = False
+        if DEBUG_TEAMNAME:
+            allspice.log.info(f'teamMods={teamMods}')
+        
+        # get organization's teams and check to see if oldTeamName is a team
        
-        response = allspice.hub.modify_team(teamID, params)
-        allspice.log.info(f'Modifying organization = {orgname}, modifying team = {oldTeamname}, to {newTeamName}')
-    except:
-        allspice.log.error(f'error with allspice.hub.modifyTeam({teamID}), Modifying organization = {orgname}, modifying team = {oldTeamname}, to {newTeamName}')
+        description  = teamMods['description']
+        permission   = teamMods['permission']
+        canCreateOrgRepo = teamMods['can_create_org_repo']
+        includesAllRepos = teamMods['includes_all_repositories']
+        units_map = teamMods['units_map']
+        teamname = teamMods['name']
+        thisorg = None
+        teamOnServer = False
+        thisTeam = None
+        teamID = 0
+        try:
+            thisorg = orgDict[orgname]
+            thisTeam = thisorg.get_team(teamname)
+
+
+
+            if thisTeam == None:
+                print("this")
+                thisTeam = allspice.hub.create_team(    thisorg, 
+                                                        teamname, 
+                                                        teamMods['description'],
+                                                        teamMods['permission'],
+                                                        teamMods['can_create_org_repo'],
+                                                        teamMods['includes_all_repositories'],
+                                                        units, 
+                                                        teamMods['units_map'])   
+
+            else:
+
+                # print("that")
+                if thisTeam.id == 0:
+                    allspice.log.error(f'TeamID is 0, teamname={teamname}')
+                    quit()
+
+                params = { 
+                    'name'                      : teamname,
+                    'description'               : teamMods['description'],
+                    'permission'                : teamMods['permission'],
+                    'can_create_org_repo'       : teamMods['can_create_org_repo'],
+                    'includes_all_repositories' : teamMods['includes_all_repositories'],
+                    'units'                     : units,
+                    'units_map'                 : teamMods['units_map']    
+                }
+
+                foo = allspice.hub.modify_team(thisTeam.id, params)
+                allspice.log.info(f'Modifying organization = {thisorg.name}, modifying team = {teamname}')
+        except:
+            allspice.log.error(f'error {orgname}.getTeams()')
+            quit()
+
+        
+        # Add users to team
+        for email in teamMods['emailList']:
+            user = allspice.hub.get_user_by_email(email)
+            DEBUG_EMAILS = False
+            if DEBUG_EMAILS:
+                allspice.log.info(f'Modifying organization: {thisorg.name}, team {teamname}, adding email={email}')
+            
+            if thisTeam is not None:
+                thisTeam.add_user(user)
+
 
 allspice.log.info(f'{__file__} completed')
