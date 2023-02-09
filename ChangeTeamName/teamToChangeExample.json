@@ -2,13 +2,13 @@
     "teamsToModify": [
         {
             "organization": "UtilityTesting",
-            "oldTeamName": "chapchaps",
+            "oldTeamName": "Commenters",
             "newTeamName": "commenters"
         },
         {
             "organization": "UtilityTestingToo",
-            "oldTeamName": "FirstRepo",
-            "newTeamName": "Interns"
+            "oldTeamName": "ContractManufacturers",
+            "newTeamName": "CMs"
         }
     ]
 }
