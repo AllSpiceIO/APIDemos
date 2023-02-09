@@ -36,26 +36,8 @@ Windows
 `set ALLSPICE_URL="https://hub.allspice.io"`
 
 
-## Modify teamplayer.py
-- change orgsToMod to create a whitelist of organizations to modify
-Example
-`orgsToMod = ["UtilityTesting", "ExampleOrganization"]`
+## Modify json file
 
-- change teamList to include your teams, their permissions, and user emails
 
 ## Run the script
-`python3 teamplayer.py`
-
-Example output:
-```
-Gitea Version: 1.17.4+1-7-g7f904f2fc
-API-Token belongs to user: AllSpiceUser
-Modifying organization, ExampleOrganization
-Modifying organization: ExampleOrganization, adding team: Owners
-Modifying organization: ExampleOrganization, adding team: Collaborators
-Modifying organization: ExampleOrganization, adding team: Contributors
-Modifying organization, UtilityTesting
-Modifying organization: UtilityTesting, adding team: Owners
-Modifying organization: UtilityTesting, adding team: Collaborators
-Modifying organization: UtilityTesting, adding team: Contributors
-```
+`python3 changeteamname.py teamtoChangeExample.json`

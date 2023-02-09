@@ -1,3 +1,6 @@
+
+Note: this is a modified version of py-gitea, adding extra functionality
+
 # py-gitea
 
 A very simple API client for Gitea > 1.16.1 

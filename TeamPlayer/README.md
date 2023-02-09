@@ -18,17 +18,15 @@ for organization in orgsToMod:
 
 
 Script will add all teams+teammembers from teamList to all organizations from orgsToMod
-
+If a team does not exist it is created. If a team already exists, it will be modified.
 
 ## Setup
-Clone this repo
+Clone this repo API_DEMOS
 
-Clone the python wrapper for gitea into this repo/gitea : https://github.com/AllSpiceIO/py-gitea
-example:
-Teamplayer/gitea/readme.md
-Teamplayer/gitea/gitea/gitea.py
+Teamplayer requires a modified version of py-gitea and is located in the API_DEMOS/pygitea_mod folder
+    This folder should clone automatically
+    These modifications are temporary. We are trying to get the changes upstreamed and remove our modified pygitea, but for now, this gives access to unsupported functions
 
-Do not use https://github.com/Langenfeld/py-gitea as modifications and extentions have been madeeeeee
 
 
 ## Environmental variables
@@ -51,26 +49,10 @@ Windows
 `set ALLSPICE_URL="https://hub.allspice.io"`
 
 
-## Modify teamplayer.py
-- change orgsToMod to create a whitelist of organizations to modify
-Example
-`orgsToMod = ["UtilityTesting", "ExampleOrganization"]`
+## Edit your json file
 
-- change teamList to include your teams, their permissions, and user emails
 
 ## Run the script
-`python3 teamplayer.py`
+`python3 teamplayer.py UpdateOrgTeamsExample.json`
 
-Example output:
-```
-Gitea Version: 1.17.4+1-7-g7f904f2fc
-API-Token belongs to user: AllSpiceUser
-Modifying organization, ExampleOrganization
-Modifying organization: ExampleOrganization, adding team: Owners
-Modifying organization: ExampleOrganization, adding team: Collaborators
-Modifying organization: ExampleOrganization, adding team: Contributors
-Modifying organization, UtilityTesting
-Modifying organization: UtilityTesting, adding team: Owners
-Modifying organization: UtilityTesting, adding team: Collaborators
-Modifying organization: UtilityTesting, adding team: Contributors
-```
+
