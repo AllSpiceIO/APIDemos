@@ -11,7 +11,8 @@ import sys
 sys.path.append('..')
 from allspice_proto.allspice_proto import AllSpice_Proto
 allspice = AllSpice_Proto()
-allspice.start()
+if (allspice.start() is False):
+    quit()
 
 
 # helper class, different than gitea.teams, should merge
@@ -62,7 +63,14 @@ if (    teamsToMod                  is None or
 
 allspice.log.info(f'{__file__}, {allspice.URL} python script')
 
-orgs = allspice.hub.get_orgs();
+orgs = None
+try:
+    orgs = allspice.hub.get_orgs();
+    
+except: 
+    allspice.log.error(f'failure on orgs = allspice.hub.get_orgs() - check permission')
+    quit()
+    
 orgnames = []
 orgDict = {}
 DEBUG_GET_ORGS = False
