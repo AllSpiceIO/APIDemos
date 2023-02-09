@@ -57,6 +57,9 @@ class AllSpice_Proto(object):
         # URL = "https://hub.allspice.io"
         try:
             self.hub = Gitea(self.URL, TOKEN)
+            if self.hub is None:
+                self.log.error(f'Failure on gitea = Gitea(URL, TOKEN), i.e gitea = Gitea({self.URL}, **hidden**), {self.hub}')
+                quit()
         except:
             self.log.error(f'Failure on gitea = Gitea(URL, TOKEN), i.e gitea = Gitea({self.URL}, **hidden**), {self.hub}')
 
@@ -65,7 +68,7 @@ class AllSpice_Proto(object):
     foo="bar"
     log = None
     hub = None
-    ULR = ""
+    URL = ""
 
 
 
