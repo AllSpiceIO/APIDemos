@@ -18,25 +18,32 @@ allspice = AllSpice_Proto()
 allspice.start()
 allspice.hub.logEveryEndpoint(True)
 
+delayserver()
 
 
 
+allspice.infoheader("Test /version")
 # test GET server version
 versionResponse = ""
 try:
-    delayserver()
     versionResponse = allspice.hub.get_version()
+    delayserver()
 except:
     allspice.log.error(f'failure to gitea.get_version()')
     quit()
 
 allspice.log.info(f'/version, Allspice Version: {versionResponse}')
 
+
+
+
+allspice.infoheader("Test /user")
 # test GET /user, get the authenticated user
 username = ""
 try:
     delayserver()
     username = allspice.hub.get_user().username
+    delayserver()
 except:
     allspice.log.error(f'User authentication invalid {username}')
     quit()
@@ -45,31 +52,39 @@ allspice.log.info(f'/user, API-Token belongs to user: {username}')
 
 
 
-# test GET /users/{username} --------------------------------------------------
+allspice.infoheader("Test /users/{username}")
 # username is from previous example
 user = None
 try:
     user = allspice.hub.get_user_by_username(username)
+    delayserver()
 except:
     allspice.log.error('error with get_user_by_username()')
     quit()
 
+
+
+
+allspice.infoheader("Test user object dump")
 userinfo = f'/users/{username}, '
-# loop through every json element and add to log string
-for (key) in user:
-    userinfo += f'{key}=%s, ' % user[key].__str__()
+
+for key in user.__dict__:
+    thisval = user.__dict__[key]
+    userinfo += f'{key} = {thisval}, '
+
 allspice.log.info(userinfo)
 
-print (f'[{user}]')
 
 
 
-# test GET /users/{username}/repos --------------------------------------------
+allspice.infoheader("Test /users/{username}/repos")
 userobj = None
 userrepos = None
 try:
-    userobj = allspice.hub.get_user_object(username)
+    userobj = allspice.hub.get_user_by_username(username)
+    delayserver()
     userrepos = userobj.get_repositories()
+    delayserver()
 except:
     allspice.log.error('error with user.get_user_object()')
     quit()
@@ -77,17 +92,13 @@ except:
 repoinfo = f'/users/{username}/repos, '
 # loop through every json element and add to log string
 
+# list the repo names
 for repo in userrepos:
     repoinfo += f'{repo.name}, '
-
-# for repo in userrepos:
-#     # repoinfo += f'{repo.name} {repo.has_issues}, '
-#     for key in repo.__dict__:
-#         thisthing = repo.__dict__[key]
-#         repoinfo += f'{key} = {thisthing}, '
-
 allspice.log.info(repoinfo)
 
+
+allspice.infoheader("Test repo object dump")
 repoinfo = "repo info dump"
 thisrepo = userrepos[0] # arbitrary repo
 for key in thisrepo.__dict__:
