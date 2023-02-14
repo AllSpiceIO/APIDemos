@@ -32,7 +32,14 @@ class AllSpice_Proto(object):
         print("baz")
     
     def version(self):
-        print("v0.5")
+        print("v0.51")
+
+    def infoheader(self, text):
+        outtext = '---- ' + text + ' '
+        length = len(outtext)
+        outtext += (80-length) * '-'
+        print()
+        self.log.info(outtext)
 
     def start(self):
 
