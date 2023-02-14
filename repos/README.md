@@ -1,7 +1,7 @@
-# user.py
+# repos.py
 
 ## Summary
-A series of API demonstrations on the /user endpoint
+A series of API demonstrations on the /repos endpoint
 
 ## Usage
 From the command line, create two environmental variables
