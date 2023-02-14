@@ -43,7 +43,9 @@ except:
 
 allspice.log.info(f'/user, API-Token belongs to user: {username}')
 
-#test GET /users/{username}
+
+
+# test GET /users/{username} --------------------------------------------------
 # username is from previous example
 user = None
 try:
@@ -52,11 +54,49 @@ except:
     allspice.log.error('error with get_user_by_username()')
     quit()
 
-userinfo = f'/user/{username}, '
+userinfo = f'/users/{username}, '
 # loop through every json element and add to log string
 for (key) in user:
     userinfo += f'{key}=%s, ' % user[key].__str__()
 allspice.log.info(userinfo)
+
+print (f'[{user}]')
+
+
+
+# test GET /users/{username}/repos --------------------------------------------
+userobj = None
+userrepos = None
+try:
+    userobj = allspice.hub.get_user_object(username)
+    userrepos = userobj.get_repositories()
+except:
+    allspice.log.error('error with user.get_user_object()')
+    quit()
+
+repoinfo = f'/users/{username}/repos, '
+# loop through every json element and add to log string
+
+for repo in userrepos:
+    repoinfo += f'{repo.name}, '
+
+# for repo in userrepos:
+#     # repoinfo += f'{repo.name} {repo.has_issues}, '
+#     for key in repo.__dict__:
+#         thisthing = repo.__dict__[key]
+#         repoinfo += f'{key} = {thisthing}, '
+
+allspice.log.info(repoinfo)
+
+repoinfo = "repo info dump"
+thisrepo = userrepos[0] # arbitrary repo
+for key in thisrepo.__dict__:
+    thisthing = thisrepo.__dict__[key]
+    repoinfo += f'{key} = {thisthing}, '
+allspice.log.info(repoinfo)
+
+
+
 
 ## Todo list - if you need 
 
@@ -110,7 +150,7 @@ allspice.log.info(userinfo)
 #test GET /users/{username}/following/{target} check if one iser is following another user
 #test GET /users/{username}/gpg_keys
 #test GET /users/{username}/heatmap
-#test GET /users/{username}/repos
+
 #test GET /users/{username}/starred
 #test GET /users/{username}/subscription
 #test GET /users/{username}/tokens
