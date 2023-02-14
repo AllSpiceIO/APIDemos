@@ -9,17 +9,19 @@ import urllib3
 from .apiobject import User, Organization, Repository, Team
 from .exceptions import NotFoundException, ConflictException, AlreadyExistsException
 
-
 class Gitea:
     """ Object to establish a session with Gitea. """
     ADMIN_CREATE_USER = """/admin/users"""
     GET_USERS_ADMIN = """/admin/users"""
+    GET_USERS_BY_USERNAME = """/users/%s""" # <username>
     ADMIN_REPO_CREATE = """/admin/users/%s/repos"""  # <ownername>
     GITEA_VERSION = """/version"""
     GET_USER = """/user"""
     CREATE_ORG = """/admin/users/%s/orgs"""  # <username>
     CREATE_TEAM = """/orgs/%s/teams"""  # <orgname>
     MODIFY_TEAM = """/teams/%s"""  # <teamID>
+    
+    
 
     def __init__(
             self,
@@ -47,6 +49,7 @@ class Gitea:
         }
         self.url = gitea_url
         self.requests = requests.Session()
+        
 
         # Manage authentification
         if not token_text and not auth:
@@ -59,8 +62,14 @@ class Gitea:
         # Manage SSL certification verification
         self.requests.verify = verify
         if not verify:
-            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)     
 
+        self.logendpoints = False
+
+
+    def logEveryEndpoint(self, logOrNot=False):
+        self.logendpoints = logOrNot
+        return
 
     def __get_url(self, endpoint):
         url = self.url + "/api/v1" + endpoint
@@ -79,9 +88,20 @@ class Gitea:
         combined_params.update(params)
         if sudo:
             combined_params["sudo"] = sudo.username
+        if self.logendpoints:
+            self.logger.info(f'endpoint = {endpoint}')
         request = self.requests.get(self.__get_url(endpoint), headers=self.headers, params=combined_params)
         if request.status_code not in [200, 201]:
             message = f"Received status code: {request.status_code} ({request.url})"
+            if request.status_code in [503]:
+                if request.headers['x-ratelimit-status'] == "REJECTED":
+                    self.logger.error(f'503 error, x-ratelimit-status=REJECTED')
+                    raise Exception(f'503 error, x-ratelimit-status=REJECTED')
+                    
+                else:
+                    status = request.headers['x-ratelimit-status']
+                    print(f'L {status} L')
+                raise Exception(f'503 error, {message}')
             if request.status_code in [404]:
                 raise NotFoundException(message)
             if request.status_code in [403]:
@@ -152,6 +172,7 @@ class Gitea:
         return User.parse_response(self, result)
 
     def get_version(self) -> str:
+        result=None
         result = self.requests_get(Gitea.GITEA_VERSION)
         return result["version"]
 
@@ -166,12 +187,19 @@ class Gitea:
                 return user
         return None
 
+    # /admin/users Admin method
     def get_user_by_name(self, username: str) -> User:
         users = self.get_users()
         for user in users:
             if user.username == username:
                 return user
         return None
+
+    # /user/{username} non-admin method
+    def get_user_by_username(self, username:str) -> User:
+        result = self.requests_get(Gitea.GET_USERS_BY_USERNAME % username)
+        # print(f'results ({results})')
+        return result
 
     def create_user(
             self,
