@@ -2,6 +2,8 @@
 
 # A demo script that demonstrates api calls /user
 
+
+
 from time import sleep
 def delayserver():
     sleep(0.01)
@@ -20,6 +22,7 @@ allspice.hub.logEveryEndpoint(True)
 
 delayserver()
 
+from pygitea_mod.gitea.apiobject import Repository
 
 
 allspice.infoheader("Test /version")
@@ -55,10 +58,10 @@ allspice.log.info(f'/user, API-Token belongs to user: {username}')
 
 
 
-allspice.infoheader("Test GET /repos/{owner}/{repo}")
-# test GET     /repos/{owner}/{repo}                               Get a repository
 
-serobj = None
+
+allspice.infoheader("Test GET /users/{username}/repos")
+userobj = None
 userrepos = None
 try:
     userobj = allspice.hub.get_user_by_username(username)
@@ -86,6 +89,22 @@ for key in thisrepo.__dict__:
 allspice.log.info(repoinfo)
 
 
+allspice.infoheader("Test GET /repos/{owner}/{repo}")
+thisrepo = userrepos[0] # arbitrary repo
+# thisorg = username
+
+repoClass = Repository(allspice.hub)
+repoObj = repoClass.get_repository(username, thisrepo.name)
+allspice.log.info(repoObj)
+
+allspice.infoheader("Test repo object dump")
+repoinfo = "repo info dump"
+for key in repoObj.__dict__:
+    thisthing = thisrepo.__dict__[key]
+    repoinfo += f'{key} = {thisthing}, '
+allspice.log.info(repoinfo)
+
+# test GET     /repos/{owner}/{repo}                               Get a repository
 
 ## API list - if you need a python wrapper or an example from below, contact us at support@allspice with the requested API call 
 # for up-to-date api information, visit https://hub.allspice.io/api/swagger
