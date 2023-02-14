@@ -372,6 +372,12 @@ class Repository(ApiObject):
         "website",
     }
 
+    def get_repository(self, ownername, reponame) -> List["Repository"]:
+        """ Get all Repositories owned by this User."""
+        url = f"/repos/{ownername}/{reponame}"
+        result = self.gitea.requests_get(url)
+        return Repository.parse_response(self.gitea, result)
+
     def get_branches(self) -> List['Branch']:
         """Get all the Branches of this Repository."""
         results = self.gitea.requests_get(
