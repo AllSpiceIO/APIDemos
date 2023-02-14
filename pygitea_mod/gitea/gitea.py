@@ -198,13 +198,9 @@ class Gitea:
     # /user/{username} non-admin method
     def get_user_by_username(self, username:str) -> User:
         result = self.requests_get(Gitea.GET_USERS_BY_USERNAME % username)
-        return result
-        
-        
-    def get_user_object(self, username:str) -> User:
-        result = self.requests_get(Gitea.GET_USERS_BY_USERNAME % username)        
         return User.parse_response(self, result)
-
+        
+    
     def create_user(
             self,
             user_name: str,
