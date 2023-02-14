@@ -109,7 +109,7 @@ allspice.log.info(repoinfo)
 
 
 
-## Todo list - if you need 
+## Remaining list - if you need a python wrapper or an example from below, contact us at support@allspice with the requested API call 
 
 ## Applies to authenticated users
 #test GET       /user/applications/oauth2 
