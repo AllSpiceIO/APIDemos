@@ -25,6 +25,7 @@ delayserver()
 from pygitea_mod.gitea.apiobject import Repository
 
 
+# -----------------------------------------------------------------------------
 allspice.infoheader("Test GET /version")
 # test GET server version
 versionResponse = ""
@@ -39,7 +40,7 @@ allspice.log.info(f'/version, Allspice Version: {versionResponse}')
 
 
 
-
+# -----------------------------------------------------------------------------
 allspice.infoheader("Test GET /user")
 # test GET /user, get the authenticated user
 username = ""
@@ -55,11 +56,7 @@ allspice.log.info(f'/user, API-Token belongs to user: {username}')
 
 
 
-
-
-
-
-
+# -----------------------------------------------------------------------------
 allspice.infoheader("Test GET /users/{username}/repos")
 userobj = None
 userrepos = None
@@ -73,25 +70,25 @@ except:
     quit()
 
 repoinfo = f'/users/{username}/repos, '
-# loop through every json element and add to log string
 
 # list the repo names
 for repo in userrepos:
     repoinfo += f'{repo.name}, '
 allspice.log.info(repoinfo)
 
+
 allspice.infoheader("Test GET /users/{username}/repos object dump")
 repoinfo = "repo info dump"
+
 thisrepo = userrepos[0] # arbitrary repo
-for key in thisrepo.__dict__:
-    thisthing = thisrepo.__dict__[key]
-    repoinfo += f'{key} = {thisthing}, '
-allspice.log.info(repoinfo)
+allspice.log.info(thisrepo.__dict__.__str__())
 
-
+# -----------------------------------------------------------------------------
 allspice.infoheader("Test GET /repos/{owner}/{repo}")
+# test GET     /repos/{owner}/{repo}                               Get a repository
+# Use existing repo object to get repo name
+# Use repo name to get duplicate object from different endpoint to test this endpoint
 thisrepo = userrepos[0] # arbitrary repo
-# thisorg = username
 
 repoClass = Repository(allspice.hub)
 repoObj = repoClass.get_repository(username, thisrepo.name)
@@ -99,12 +96,9 @@ allspice.log.info(repoObj)
 
 allspice.infoheader("Test GET /repos/{owner}/{repo} object dump")
 repoinfo = "repo info dump"
-for key in repoObj.__dict__:
-    thisthing = thisrepo.__dict__[key]
-    repoinfo += f'{key} = {thisthing}, '
-allspice.log.info(repoinfo)
+allspice.log.info(repoObj.__dict__.__str__())
 
-# test GET     /repos/{owner}/{repo}                               Get a repository
+
 
 ## API list - if you need a python wrapper or an example from below, contact us at support@allspice with the requested API call 
 # for up-to-date api information, visit https://hub.allspice.io/api/swagger
