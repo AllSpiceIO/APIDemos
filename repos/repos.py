@@ -72,8 +72,10 @@ except:
 repoinfo = f'/users/{username}/repos, '
 
 # list the repo names
+reponames = []
 for repo in userrepos:
     repoinfo += f'{repo.name}, '
+    reponames.append(repo.name)
 allspice.log.info(repoinfo)
 
 
@@ -99,13 +101,33 @@ repoinfo = "repo info dump"
 allspice.log.info(repoObj.__dict__.__str__())
 
 
+# POST    /repos/{template_owner}/{template_repo}/generate 
+allspice.infoheader("Test POST /repos/{template_owner}/{template_repo}/generate")
+
+newrepo = None
+if ("ANewRepo" not in reponames):
+    newrepo = userobj.create_repo_from_template("AllSpiceUser","TemplateExample", "ANewRepo", "A wonderful repo")
+    allspice.log.info(newrepo.__dict__.__str__())
+
+# -----------------------------------------------------------------------------
+# DELETE  /repos/{owner}/{repo}                               Delete a repository
+allspice.infoheader("Test DELETE /repos/{owner}/{repo}")
+repoObj = repoClass.get_repository(username, "ANewRepo")
+repoObj.delete()
+try:
+    repoObj = repoClass.get_repository(username, "ANewRepo")
+
+except:
+    allspice.log.info("deleted repo not found. Neat.")
+
+
 
 ## API list - if you need a python wrapper or an example from below, contact us at support@allspice with the requested API call 
 # for up-to-date api information, visit https://hub.allspice.io/api/swagger
 
 # POST    /repos/migrate                                      Migrate a remote git repository
 # GET     /repos/search                                       Search for repositories
-# GET     /repos/{owner}/{repo}                               Get a repository
+#*GET     /repos/{owner}/{repo}                               Get a repository
 # DELETE  /repos/{owner}/{repo}                               Delete a repository
 # PATCH   /repos/{owner}/{repo} Edit a repository's properties. Only fields that are set will be changed.
 # GET     /repos/{owner}/{repo}/allspice_generated/json/{filepath}    Get the json blob for a cad file if it exists, otherwise enqueue a new job and return a 503 status. Note: This is still experimental and not yet recommended for critical applications.
