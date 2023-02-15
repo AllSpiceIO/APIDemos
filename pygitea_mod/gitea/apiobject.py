@@ -225,7 +225,7 @@ class User(ApiObject):
             license: str = None,
             readme: str = "Default",
             issue_labels: str = None,
-            default_branch="master",
+            default_branch="main",
     ):
         """Create a user Repository
 
@@ -253,6 +253,55 @@ class User(ApiObject):
             self.gitea.logger.error(result["message"])
             raise Exception("Repository not created... (gitea: %s)" % result["message"])
         return Repository.parse_response(self, result)
+
+
+    def create_repo_from_template(
+            self,
+            owner: str,
+            templatereponame: str,
+            newreponame: str,
+            description: str = "",
+            private: bool = False,
+            gitignores: str = None,
+            license: str = None,
+            readme: str = "Default",
+            includeTemplateGitContent: bool = True,
+            includeTemplateLabels: bool = True,
+            default_branch="main",
+            includeTemplateTopics: bool = True,
+            includeTemplateWebhooks: bool = True,
+            includeTemplateGithooks: bool = True,
+    ):
+        """Create a user Repository
+
+        Throws:
+            AlreadyExistsException: If the Repository exists already.
+            Exception: If something else went wrong.
+        """
+        result = self.gitea.requests_post(
+            f"/repos/{owner}/{templatereponame}/generate",
+            data={
+                "owner": owner,
+                "name": newreponame,
+                "description": description,
+                "private": private,
+                "issue_labels": includeTemplateLabels,
+                "readme": readme,
+                "default_branch": default_branch,
+                "topics": includeTemplateTopics,
+                "webhooks": includeTemplateWebhooks,
+                "git_content": includeTemplateGitContent,
+                "git_hooks": includeTemplateGithooks,
+                "avatar": False,
+            },
+        )
+        if "id" in result:
+            self.gitea.logger.info("Successfully created Repository %s " % result["name"])
+        else:
+            self.gitea.logger.error(result["message"])
+            raise Exception("Repository not created... (gitea: %s)" % result["message"])
+        return Repository.parse_response(self, result)
+
 
     def get_repositories(self) -> List["Repository"]:
         """ Get all Repositories owned by this User."""
