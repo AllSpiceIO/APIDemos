@@ -25,7 +25,7 @@ delayserver()
 from pygitea_mod.gitea.apiobject import Repository
 
 
-allspice.infoheader("Test /version")
+allspice.infoheader("Test GET /version")
 # test GET server version
 versionResponse = ""
 try:
@@ -40,7 +40,7 @@ allspice.log.info(f'/version, Allspice Version: {versionResponse}')
 
 
 
-allspice.infoheader("Test /user")
+allspice.infoheader("Test GET /user")
 # test GET /user, get the authenticated user
 username = ""
 try:
@@ -80,7 +80,7 @@ for repo in userrepos:
     repoinfo += f'{repo.name}, '
 allspice.log.info(repoinfo)
 
-allspice.infoheader("Test repo object dump")
+allspice.infoheader("Test GET /users/{username}/repos object dump")
 repoinfo = "repo info dump"
 thisrepo = userrepos[0] # arbitrary repo
 for key in thisrepo.__dict__:
@@ -97,7 +97,7 @@ repoClass = Repository(allspice.hub)
 repoObj = repoClass.get_repository(username, thisrepo.name)
 allspice.log.info(repoObj)
 
-allspice.infoheader("Test repo object dump")
+allspice.infoheader("Test GET /repos/{owner}/{repo} object dump")
 repoinfo = "repo info dump"
 for key in repoObj.__dict__:
     thisthing = thisrepo.__dict__[key]
