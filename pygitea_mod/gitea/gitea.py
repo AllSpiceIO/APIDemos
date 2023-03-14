@@ -20,6 +20,8 @@ class Gitea:
     CREATE_ORG = """/admin/users/%s/orgs"""  # <username>
     CREATE_TEAM = """/orgs/%s/teams"""  # <orgname>
     MODIFY_TEAM = """/teams/%s"""  # <teamID>
+    REPO_ADD_FILE = """/repos/%s/%s/contents/%s""" #owner, reponame, filepath
+    GET_REPO_JSON = """/repos/%s/%s/allspice_generated/json/%s""" # owner, reponame, filepath
     
     
 
@@ -157,6 +159,14 @@ class Gitea:
             self.logger.error(error_message)
             raise Exception(error_message)
         return self.parse_result(request)
+    
+    def requests_patch_mod(self, endpoint: str, data: dict):
+        request = self.requests.patch(self.__get_url(endpoint), headers=self.headers, data=json.dumps(data))
+        if request.status_code not in [200, 201]:
+            error_message = f"Received status code: {request.status_code} ({request.url}) {data}"
+            self.logger.error(error_message)
+            raise Exception(error_message)
+        return request
 
     def get_orgs_public_members_all(self, orgname):
         path = "/orgs/" + orgname + "/public_members"
@@ -416,4 +426,44 @@ class Gitea:
         api_object = Team.parse_response(self, result)
         pass
         return api_object
+    
+
+    def getRepoJSON(
+            self,
+            owner,
+            reponame,
+            filepath,
+            branch="main"
+    ):
+ 
+        request = Gitea.GET_REPO_JSON % (owner, reponame, filepath)
+        result = self.requests_get(request)
+        return (result)
+
+    def add_file(
+            self,
+            owner: str,
+            reponame: str,
+            branch: str,
+            filename: str,
+            modifications: dict
+    ):
+        """ Modifies a Team.
+
+        Args:
+            teamID (int): ID of the team to modify
+            data (dict): A dict of the attributes you want to modify (per the JSON model)
+        """
+
+        endpoint = Gitea.REPO_ADD_FILE % (owner, reponame, filename)
+        print(endpoint)
+
+        result = self.requests_patch_mod(
+            Gitea.REPO_ADD_FILE % (owner, reponame, filename),
+            data=modifications,
+        )
+
+        
+        pass
+        return result
 
