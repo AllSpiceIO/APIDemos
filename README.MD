@@ -26,3 +26,4 @@ If you need to generate an access token, this will help you: [https://allspice.d
 
 ## Demo folders
 - [HelloWorld:](/HelloWorld/) A great place to start to see if everything is working fine
+- [GetRepoJson:](/GetRepoJSON/) Retrieves a json object of schematics or PCBs
