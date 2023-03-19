@@ -33,6 +33,7 @@ sch_dict = allspice.requests_get(sch_url)
 
 
 ## Parsing example, generate CSV of components -------------------------------------
+# Generates header and index to json attributes
 attribute_list = [
     "Designator",
     "MANUFACTURER",
@@ -46,47 +47,51 @@ attribute_list = [
     "Comment"
 ]
 
-## Print csv header row
-csv_header_row = ""
-for attribute in attribute_list:
-    csv_header_row += attribute + ", "
-csv_header_row += "\n"    
-
+# Setup CSV writer
+import csv
 csv_filename = "example_part_list.csv"
-csv_file = open(csv_filename, "w")
-csv_file.write(csv_header_row)
+csv_file = open(csv_filename, "w", newline='')
+csv_writer = csv.writer(csv_file)
 
+# Write CSV header row
+csv_writer.writerow(attribute_list)
+
+# Add each attribute to a list and then write the list to the CSV file
 component_list = []
 for key in sch_dict:
-    
+
+    # Check for wrong data type
     if "type" not in sch_dict[key]:
         continue
 
+    # Check for component type
     if sch_dict[key]["type"] != "Component":
         continue
     
-    # print(f"{key}:{sch_dict[key]}")
-    csv_record = ""
+    # Add each attribute to the list
+    csv_record_list = []
     for attribute in attribute_list:
+
+        # check if attribute in record
         if attribute not in sch_dict[key]["attributes"]:
-            csv_record += "NA, "
+            csv_record_list.append("NA")
             continue
 
-        csv_record += sch_dict[key]["attributes"][attribute]["text"] + ", "
+        # write csv record of all attributes
+        csv_record_list.append(sch_dict[key]["attributes"][attribute]["text"])
 
     # To add variants:
     # variant_attributes_dict = sch_dict[key]["variant_attributes"]
 
-    csv_record += "\n"    
-    csv_file.write(csv_record)
+    csv_writer.writerow(csv_record_list)   
 
 print(f"Parts list written to {csv_filename}")
 csv_file.close()
 
 
-# Convert to JSON
+# Convert schematic dictionary to JSON -----------------------------
 import json
-sch_json = json.dumps(sch_dict)
+sch_json = json.dumps(sch_dict, indent=4)
 
 out_filename = "example_out.json"
 file_out = open (out_filename, "w")
