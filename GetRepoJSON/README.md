@@ -1,7 +1,8 @@
 # GetRepoJSON.py
 
 ## Summary
-returns a JSON object of a PCB or Schematic file
+Parses schematic to json file
+Parses schematic to bom csv file
 
 ## Usage
 From the command line, create two environmental variables
@@ -16,8 +17,10 @@ export ALLSPICE_ACCESS_TOKEN="your-access-token"
 
 To run:
 ```
-python3 getRepoJSON.py > youroutfile.json
+python3 getRepoJSON.py
 
 ```
+
+The program will output where it has written files
 
 If you need help, check out our tutorial on [how to create an AllSpice access token](https://allspice.document360.io/docs/how-to-create-an-allspice-authentication-application-access-token).
