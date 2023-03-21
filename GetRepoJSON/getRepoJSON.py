@@ -1,4 +1,7 @@
 # get_repo_json.py
+
+## This function will be replaced by built-in rate limiting
+# https://github.com/AllSpiceIO/py-allspice/issues/6
 from time import sleep
 def delayserver():
     sleep(0.01)
