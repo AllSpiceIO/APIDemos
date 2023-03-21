@@ -1,17 +1,20 @@
 # get_repo_json.py
 
-## This function will be replaced by built-in rate limiting
+# This function will be replaced by built-in rate limiting
 # https://github.com/AllSpiceIO/py-allspice/issues/6
+import os
+import json
+from gitea import *
 from time import sleep
+
+
 def delayserver():
     sleep(0.01)
     return
 
-import os
-from gitea import *
 
 try:
-    URL   = os.environ['ALLSPICE_URL']
+    URL = os.environ['ALLSPICE_URL']
 except:
     print("Invalid URL. Run this command:")
     print("export ALLSPICE_URL=\"https://hub.allspice.io\"")
@@ -35,6 +38,5 @@ file_dict = allspice.requests_get(file_url)
 #     # print (f"{key}:{file_dict[key]}")
 
 # Convert to JSON
-import json
 file_json = json.dumps(file_dict)
 print(file_json)
