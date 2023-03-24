@@ -7,7 +7,8 @@ import json
 from gitea import *
 from time import sleep
 
-
+# Will remove when rate limiting is added to py-allspice 
+# https://github.com/AllSpiceIO/py-allspice/issues/6
 def delayserver():
     sleep(0.01)
     return
