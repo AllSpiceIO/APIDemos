@@ -2,7 +2,6 @@
 from time import sleep
 def delayserver():
     sleep(0.01)
-    return
 
 import os
 from gitea import *
@@ -12,12 +11,14 @@ try:
 except:
     print("Invalid URL. Run this command:")
     print("export ALLSPICE_URL=\"https://hub.allspice.io\"")
+    quit()
 
 try:
     TOKEN = os.environ['ALLSPICE_ACCESS_TOKEN']
 except:
     print("Token. Set environmental variables")
     print(">export ALLSPICE_ACCESS_TOKEN=\"YourAccessToken\"")
+    quit()
 
 allspice = Gitea(URL, TOKEN)
 delayserver()
@@ -25,7 +26,12 @@ delayserver()
 # Replace with your owner, repo, and filename
 # /repos/repo_owner/repo_name/allspice_generated/json/filename
 sch_url = "/repos/AllSpiceUser/ArchimajorFork/allspice_generated/json/Mosfets.SchDoc"
-sch_dict = allspice.requests_get(sch_url)
+
+# Set branch / ref
+params = {"ref":"main"}
+
+# Request the allspice generated JSON file
+sch_dict = allspice.requests_get(sch_url, params)
 
 # Example how to use dict
 # for key in file_dict:
