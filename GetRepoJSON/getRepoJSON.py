@@ -35,15 +35,16 @@ delay_server()
 # Replace with your owner, repo, and filename
 # /repos/repo_owner/repo_name/allspice_generated/json/filename
 file_url = "/repos/AllSpiceUser/ArchimajorFork/allspice_generated/json/Mosfets.SchDoc"
-file_dict = allspice.requests_get(file_url)
+
+# Set branch / ref
+params = {"ref": "main"}
+
+file_dict = allspice.requests_get(file_url, params)
 
 # Example how to use dict
 # for key in file_dict:
 #     # print (f"{key}:{file_dict[key]}")
 
-# Set branch / ref
-params = {"ref": "main"}
-
 # Convert to JSON
-file_json = json.dumps(file_dict, params)
+file_json = json.dumps(file_dict)
 print(file_json)
