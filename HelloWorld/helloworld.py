@@ -1,32 +1,27 @@
 # HelloWorld.py
 
-# If you're new to scripting, this is a great place to start. 
+# If you're new to scripting, this is a great place to start.
 
 # Hello World starts you out easy with some simple server requests.
 # This will help you troubleshoot your connection and show you the basics of making an api request
+#
+# For more information read our README.md
+import os
+from gitea import *
 
-import sys
-sys.path.append('..')
-from allspice.allspice import AllSpice
-allspice = AllSpice()
-allspice.start()
-
-versionResponse = ""
 try:
-    versionResponse = allspice.hub.get_version()
+    URL = os.environ['ALLSPICE_URL']
 except:
-    allspice.log.error(f'failure to gitea.get_version()')
-    quit()
+    print("Invalid URL. Run this command:")
+    print("export ALLSPICE_URL=\"https://hub.allspice.io\"")
 
-allspice.log.info(f'Allspice Version: {versionResponse}')
-
-username = ""
 try:
-    username = allspice.hub.get_user().username
+    TOKEN = os.environ['ALLSPICE_ACCESS_TOKEN']
 except:
-    allspice.log.error('User authentication invalid')
-    quit()
+    print("Token. Set environmental variables")
+    print(">export ALLSPICE_ACCESS_TOKEN=\"YourAccessToken\"")
 
-allspice.log.info(f'API-Token belongs to user: {username}')
+allspice = Gitea(URL, TOKEN)
 
-
+print("AllSpice Version: " + allspice.get_version())
+print("API-Token belongs to user: " + allspice.get_user().username)

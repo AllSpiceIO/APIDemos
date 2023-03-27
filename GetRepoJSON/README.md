@@ -1,7 +1,7 @@
-# user.py
+# GetRepoJSON.py
 
 ## Summary
-A series of API demonstrations on the /user endpoint
+returns a JSON object of a PCB or Schematic file
 
 ## Usage
 From the command line, create two environmental variables
@@ -11,6 +11,12 @@ This example uses bash
 export ALLSPICE_URL="https://hub.allspice.io"
 
 export ALLSPICE_ACCESS_TOKEN="your-access-token"
+
+```
+
+To run:
+```
+python3 getRepoJSON.py > youroutfile.json
 
 ```
 
