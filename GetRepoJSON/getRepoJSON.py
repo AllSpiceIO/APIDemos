@@ -9,11 +9,8 @@ from time import sleep
 
 # Will remove when rate limiting is added to py-allspice
 # https://github.com/AllSpiceIO/py-allspice/issues/6
-
-
 def delay_server():
     sleep(0.01)
-
 
 try:
     URL = os.environ['ALLSPICE_URL']
@@ -33,17 +30,19 @@ allspice = Gitea(URL, TOKEN)
 delay_server()
 
 # Replace with your owner, repo, and filename
+owner    = "AllSpiceUser"
+reponame = "ArchimajorFork"
+api_path = "allspice_generated/json/"
+filename = "Mosfets.SchDoc"
+
+# Build API URL
 # /repos/repo_owner/repo_name/allspice_generated/json/filename
-file_url = "/repos/AllSpiceUser/ArchimajorFork/allspice_generated/json/Mosfets.SchDoc"
+file_url = f"/repos/{owner}/{reponame}/{api_path}/{filename}"
 
 # Set branch / ref
 params = {"ref": "main"}
 
 file_dict = allspice.requests_get(file_url, params)
-
-# Example how to use dict
-# for key in file_dict:
-#     # print (f"{key}:{file_dict[key]}")
 
 # Convert to JSON
 file_json = json.dumps(file_dict)
