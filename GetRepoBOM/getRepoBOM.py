@@ -4,8 +4,10 @@
 # https://github.com/AllSpiceIO/py-allspice/issues/6
 import os
 import json
-from gitea import *
+from gitea import Gitea, Repository, Content
+
 from time import sleep
+import base64
 
 # Will remove when rate limiting is added to py-allspice
 # https://github.com/AllSpiceIO/py-allspice/issues/6
@@ -13,6 +15,10 @@ from time import sleep
 
 def delay_server():
     sleep(0.01)
+
+
+# def get_repo_file()
+
 
 
 try:
@@ -32,19 +38,29 @@ except KeyError:
 allspice = Gitea(URL, TOKEN)
 delay_server()
 
-# Replace with your owner, repo, and filename
-# /repos/repo_owner/repo_name/allspice_generated/json/filename
-file_url = "/repos/AllSpiceUser/ArchimajorFork/allspice_generated/json/Mosfets.SchDoc"
+
+# Get PcbPrj file from repo
+org_name = "ProductDevelopmentFirm"
+repo_name = "ArchimajorDemo"
+project_file_name = "Archimajor.PrjPcb"
+api_command = "contents"
+api_url = f"/repos/{org_name}/{repo_name}/{api_command}/{project_file_name}"
 
 # Set branch / ref
 params = {"ref": "main"}
 
-file_dict = allspice.requests_get(file_url, params)
+contents_response = allspice.requests_get(api_url, params)
+
+file_content = base64.b64decode(contents_response["content"])
+content_string = file_content.decode("utf-8") 
+print(content_string)
+
+
 
 # Example how to use dict
 # for key in file_dict:
 #     # print (f"{key}:{file_dict[key]}")
 
 # Convert to JSON
-file_json = json.dumps(file_dict)
-print(file_json)
+# file_json = json.dumps(file_dict)
+# print(file_json)
