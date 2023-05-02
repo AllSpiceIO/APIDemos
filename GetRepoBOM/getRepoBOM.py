@@ -4,10 +4,11 @@
 # https://github.com/AllSpiceIO/py-allspice/issues/6
 import os
 import json
-from gitea import Gitea, Repository, Content
+from gitea import Gitea
 
 from time import sleep
 import base64
+import re
 
 # Will remove when rate limiting is added to py-allspice
 # https://github.com/AllSpiceIO/py-allspice/issues/6
@@ -30,6 +31,16 @@ def get_repo_file(org_name, repo_name, file_name, branch_name):
     content_string = file_content.decode("utf-8")
     return content_string
 
+
+def get_sch_file_list_from_project_file(project_file_content: str) -> list:
+    # Parse PcbPrj -> list of sch files
+    pattern = re.compile(r"DocumentPath=(.*?SchDoc)\r\n")
+
+    sch_list = []
+    for match in pattern.finditer(project_file_content):
+        sch_list.append(match.group(1))
+
+    return sch_list
 
 
 try:
@@ -56,5 +67,12 @@ repo_name = "ArchimajorDemo"
 project_file_name = "Archimajor.PrjPcb"
 branch_name = "main"
 
-content = get_repo_file(org_name, repo_name, project_file_name, branch_name)
-print(content)
+project_file_content = get_repo_file(org_name,
+                                     repo_name,
+                                     project_file_name,
+                                     branch_name)
+
+sch_file_list = get_sch_file_list_from_project_file(project_file_content)
+
+print(sch_file_list)
+
