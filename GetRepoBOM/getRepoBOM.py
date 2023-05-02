@@ -18,7 +18,7 @@ def delay_server():
     sleep(0.01)
 
 
-def get_repo_file(org_name, repo_name, file_name, branch_name):
+def get_repo_file(owner_name, repo_name, file_name, branch_name):
     api_command = "contents"
     api_url = f"/repos/{org_name}/{repo_name}/{api_command}/{file_name}"
 
@@ -41,6 +41,19 @@ def get_sch_file_list_from_project_file(project_file_content: str) -> list:
         sch_list.append(match.group(1))
 
     return sch_list
+
+def get_dict_from_sch(owner_name:str, repo_name:str, filename:str, branch_name:str)->dict:
+    # Replace with your owner, repo, and filename
+    # /repos/repo_owner/repo_name/allspice_generated/json/filename
+    api_url = "/repos/AllSpiceUser/ArchimajorFork/allspice_generated/json/Mosfets.SchDoc"
+
+    api_url = f"/repos/{owner_name}/{repo_name}/allspice_generated/json/{filename}"
+
+    # Set branch / ref
+    params = {"ref": f"{branch_name}"}
+
+    file_dict = allspice.requests_get(api_url, params)
+    return file_dict
 
 
 try:
@@ -74,5 +87,30 @@ project_file_content = get_repo_file(org_name,
 
 sch_file_list = get_sch_file_list_from_project_file(project_file_content)
 
-print(sch_file_list)
+sch_dict = get_dict_from_sch(org_name,
+                  repo_name,
+                  sch_file_list[0],
+                  "main")
 
+for key in sch_dict:
+    if (type(sch_dict[key]) is str):
+        continue
+
+    if "attributes" not in sch_dict[key].keys():
+        continue
+
+    attributes = sch_dict[key]["attributes"]
+
+    if "Designator" not in attributes.keys():
+        continue
+
+    designator = attributes["Designator"]
+
+    if "text" not in designator.keys():
+        continue
+
+    ref_des = designator["text"]
+
+    print(ref_des)
+# file_json = json.dumps(sch_dict, indent=4)
+# print(file_json)
