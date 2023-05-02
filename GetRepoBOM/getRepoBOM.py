@@ -87,30 +87,28 @@ project_file_content = get_repo_file(org_name,
 
 sch_file_list = get_sch_file_list_from_project_file(project_file_content)
 
+
+file_name = sch_file_list[0]
 sch_dict = get_dict_from_sch(org_name,
                   repo_name,
-                  sch_file_list[0],
+                  file_name,
                   "main")
 
 for key in sch_dict:
-    if (type(sch_dict[key]) is str):
+
+    try:
+        attributes = sch_dict[key]["attributes"]
+        ref_des = attributes["Designator"]["text"]
+        manufacturer_name = attributes["MANUFACTURER"]["text"]
+        manufacturer_part_number = attributes["MANUFACTURER #"]["text"]
+        # variant_attributes = attributes["variant_attributes"]
+    except KeyError:
         continue
 
-    if "attributes" not in sch_dict[key].keys():
+    except TypeError:
         continue
 
-    attributes = sch_dict[key]["attributes"]
 
-    if "Designator" not in attributes.keys():
-        continue
-
-    designator = attributes["Designator"]
-
-    if "text" not in designator.keys():
-        continue
-
-    ref_des = designator["text"]
-
-    print(ref_des)
+    print(f"{ref_des},{manufacturer_name}, {manufacturer_part_number}, {variant_attributes}")
 # file_json = json.dumps(sch_dict, indent=4)
 # print(file_json)
