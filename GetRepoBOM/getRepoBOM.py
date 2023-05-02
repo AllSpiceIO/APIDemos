@@ -42,10 +42,12 @@ def get_sch_file_list_from_project_file(project_file_content: str) -> list:
 
     return sch_list
 
-def get_dict_from_sch(owner_name:str, repo_name:str, filename:str, branch_name:str)->dict:
+def get_sch_dict_from_repo(owner_name:str, repo_name:str, filename:str, branch_name:str)->dict:
     # Replace with your owner, repo, and filename
     # /repos/repo_owner/repo_name/allspice_generated/json/filename
     api_url = "/repos/AllSpiceUser/ArchimajorFork/allspice_generated/json/Mosfets.SchDoc"
+
+
 
     api_url = f"/repos/{owner_name}/{repo_name}/allspice_generated/json/{filename}"
 
@@ -87,28 +89,33 @@ project_file_content = get_repo_file(org_name,
 
 sch_file_list = get_sch_file_list_from_project_file(project_file_content)
 
+### Print header row
+print("org_name, repo_name, file_name, refdes, mfg_name, mpn")
 
-file_name = sch_file_list[0]
-sch_dict = get_dict_from_sch(org_name,
-                  repo_name,
-                  file_name,
-                  "main")
+## print component attributes
+### for every schematic filename parsed from .PcbPrj
+for file_name in sch_file_list:
+    sch_dict = get_sch_dict_from_repo(org_name,
+                    repo_name,
+                    file_name,
+                    "main")
 
-for key in sch_dict:
+    ### parse individual attributes
+    for key in sch_dict:
 
-    try:
-        attributes = sch_dict[key]["attributes"]
-        ref_des = attributes["Designator"]["text"]
-        manufacturer_name = attributes["MANUFACTURER"]["text"]
-        manufacturer_part_number = attributes["MANUFACTURER #"]["text"]
-        # variant_attributes = attributes["variant_attributes"]
-    except KeyError:
-        continue
+        attribute_list = []
 
-    except TypeError:
-        continue
+        try:
+            attributes = sch_dict[key]["attributes"]
+            attribute_list.append( attributes["Designator"]["text"] )
+            attribute_list.append( attributes["MANUFACTURER"]["text"] )
+            attribute_list.append( attributes["MANUFACTURER #"]["text"] )
 
+        except KeyError:
+            continue
 
-    print(f"{ref_des},{manufacturer_name}, {manufacturer_part_number}, {variant_attributes}")
-# file_json = json.dumps(sch_dict, indent=4)
-# print(file_json)
+        except TypeError:
+            continue
+
+        print(f"{org_name}, {repo_name}, {file_name}, " + ', '.join(attribute_list))
+ 
