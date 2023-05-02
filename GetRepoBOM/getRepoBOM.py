@@ -17,7 +17,18 @@ def delay_server():
     sleep(0.01)
 
 
-# def get_repo_file()
+def get_repo_file(org_name, repo_name, file_name, branch_name):
+    api_command = "contents"
+    api_url = f"/repos/{org_name}/{repo_name}/{api_command}/{file_name}"
+
+    # Set branch / ref
+    params = {"ref": f"{branch_name}"}
+
+    contents_response = allspice.requests_get(api_url, params)
+
+    file_content = base64.b64decode(contents_response["content"])
+    content_string = file_content.decode("utf-8")
+    return content_string
 
 
 
@@ -43,24 +54,7 @@ delay_server()
 org_name = "ProductDevelopmentFirm"
 repo_name = "ArchimajorDemo"
 project_file_name = "Archimajor.PrjPcb"
-api_command = "contents"
-api_url = f"/repos/{org_name}/{repo_name}/{api_command}/{project_file_name}"
+branch_name = "main"
 
-# Set branch / ref
-params = {"ref": "main"}
-
-contents_response = allspice.requests_get(api_url, params)
-
-file_content = base64.b64decode(contents_response["content"])
-content_string = file_content.decode("utf-8") 
-print(content_string)
-
-
-
-# Example how to use dict
-# for key in file_dict:
-#     # print (f"{key}:{file_dict[key]}")
-
-# Convert to JSON
-# file_json = json.dumps(file_dict)
-# print(file_json)
+content = get_repo_file(org_name, repo_name, project_file_name, branch_name)
+print(content)
