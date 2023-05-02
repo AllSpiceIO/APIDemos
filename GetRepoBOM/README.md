@@ -1,7 +1,15 @@
 # GetRepoBOM.py
 
 ## Summary
-returns a BOM from a repo
+prints a BOM from a repo
+
+Reads .prjpcb file, compiles list of schematics, 
+    requests json/dict for each schematic
+    parses schematic dict for component attributes
+    prints component attributes 
+
+example uses csv output
+
 
 ## Usage
 From the command line, create two environmental variables
@@ -16,7 +24,7 @@ export ALLSPICE_ACCESS_TOKEN="your-access-token"
 
 To run:
 ```
-python3 getRepoJSON.py > youroutfile.json
+python3 getRepoBOM.py > youroutfile.csv
 
 ```
 
