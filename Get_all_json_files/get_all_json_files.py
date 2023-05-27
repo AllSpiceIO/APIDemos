@@ -4,14 +4,16 @@
 # https://github.com/AllSpiceIO/py-allspice/issues/6
 import os
 import json
-from gitea import Gitea, Organization, Commit
+from gitea import Gitea, Organization
 from time import sleep
 
 # Will remove when rate limiting is added to py-allspice
 # https://github.com/AllSpiceIO/py-allspice/issues/6
 
+
 class Object(object):
     pass
+
 
 def delay_server():
     sleep(0.01)
@@ -34,28 +36,69 @@ except KeyError:
 allspice = Gitea(URL, TOKEN)
 delay_server()
 
-this_org = Organization.request(allspice, "ProductDevelopmentFirm")
+
+def get_repo_branch_files(owner_name: str,
+                          repo_name: str,
+                          branch_name="main",
+                          path=""):
+
+    # Create Object to attach attributes to match api call
+    params = Object()
+    params.sha = branch_name
+    params.path = path
+    params.type = None
+
+    file_list = repo.get_file_content(params)
+ 
+    for obj in file_list:
+        if (obj._type == "file"):
+            print(f"{repo.name}/{branch.name} [{path}/{obj._name}]")
+            pass
+        elif (obj._type == "dir"):
+            try:
+                # recursively parse dirs
+                get_repo_branch_files(
+                    owner_name, repo_name, branch_name, obj._name)
+            except AttributeError:
+                pass
+    return None
+
+
+# TBD - replace with better example
+print(__file__)
+owner_name = "ProductDevelopmentFirm"
+
+this_org = Organization.request(allspice, owner_name)
 
 repo_list = this_org.get_repositories()
-
 
 for repo in repo_list:
 
     branch_list = repo.get_branches()
-    i=0
     for branch in branch_list:
-        params = Object()
+
         try:
-            params.sha = branch.name
-            file_list = repo.get_git_content(params)
-            for obj in file_list:
-                print(obj.name)
-            # print(f"{repo.name}/{branch.name}-> {file_list.name}")
+            foo = get_repo_branch_files(owner_name, repo.name, branch.name)
+
         except TypeError:
-            # empty branch
+            # empty branch - not sure how to check this better
             pass
 
 
+# for repo in repo_list:
+
+#     branch_list = repo.get_branches()
+#     for branch in branch_list:
+#         params = Object()
+#         try:
+#             params.sha = branch.name
+#             file_list = repo.get_git_content(params)
+#             for obj in file_list:
+#                 if(obj._type == "file"):
+#                     print(f"{repo.name}/{branch.name} [{obj._name}]")
+#         except TypeError:
+#             # empty branch - not sure how to check this better
+#             pass
 
 
 # # Replace with your owner, repo, and filename
