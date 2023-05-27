@@ -37,7 +37,7 @@ allspice = Gitea(URL, TOKEN)
 delay_server()
 
 
-def get_repo_branch_files(owner_name: str,
+def parse_repo_branch_files(owner_name: str,
                           repo_name: str,
                           branch_name="main",
                           path=""):
@@ -49,18 +49,42 @@ def get_repo_branch_files(owner_name: str,
     params.type = None
 
     file_list = repo.get_file_content(params)
- 
+    
+    
     for obj in file_list:
         if (obj._type == "file"):
-            print(f"{repo.name}/{branch.name} [{path}/{obj._name}]")
-            pass
+            file_extention = obj._name.split('.')[1]
+            file_extention = file_extention.lower()
+            if file_extention == "schdoc": 
+                new_path = ""
+                if path != "":
+                    new_path = "/" + path 
+                file_url = f"/repos/{owner_name}/{repo_name}/allspice_generated/json{new_path}/{obj._name}"
+                # print(file_url)
+                params_json_get = {"ref": "main"}
+                file_dict = allspice.requests_get(file_url, params_json_get)
+                file_json = json.dumps(file_dict, indent=4)
+
+                f = open(f"out/{owner_name}_{repo_name}_{branch_name}_{obj._name}.json", "w")
+                f.write(file_json)
+                f.close()
+
         elif (obj._type == "dir"):
             try:
                 # recursively parse dirs
-                get_repo_branch_files(
-                    owner_name, repo_name, branch_name, obj._name)
-            except AttributeError:
+                new_path = ""
+                if path != "":
+                    new_path = path + "/"
+
+                parse_repo_branch_files(
+                    owner_name, repo_name, branch_name, new_path + obj._name)
+            except Exception as e:
+                print(f"--sad--->{e}")
                 pass
+        
+        # else:
+        #     # print(f"--  ---->{obj._type}")        
+        
     return None
 
 
@@ -78,7 +102,11 @@ for repo in repo_list:
     for branch in branch_list:
 
         try:
-            foo = get_repo_branch_files(owner_name, repo.name, branch.name)
+            print("")
+            print("------------------------------------------------------------------")
+            print(f"--- Parsing: {owner_name}/{repo.name}/{branch.name} -------")
+            print("")
+            foo = parse_repo_branch_files(owner_name, repo.name, branch.name)
 
         except TypeError:
             # empty branch - not sure how to check this better
