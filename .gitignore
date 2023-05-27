@@ -1,3 +1,6 @@
 APITests/__pycache__/*
 allspice/__pycache__/*
 .DS_Store
+*.json
+bar.*
+foo.*
