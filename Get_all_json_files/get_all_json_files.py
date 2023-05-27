@@ -49,6 +49,7 @@ def parse_repo_branch_files(owner_name: str,
     params.type = None
 
     file_list = repo.get_file_content(params)
+    delay_server()
     
     
     for obj in file_list:
@@ -60,12 +61,16 @@ def parse_repo_branch_files(owner_name: str,
                 if path != "":
                     new_path = "/" + path 
                 file_url = f"/repos/{owner_name}/{repo_name}/allspice_generated/json{new_path}/{obj._name}"
-                # print(file_url)
+                print(file_url)
                 params_json_get = {"ref": "main"}
                 file_dict = allspice.requests_get(file_url, params_json_get)
+                delay_server()
                 file_json = json.dumps(file_dict, indent=4)
 
-                f = open(f"out/{owner_name}_{repo_name}_{branch_name}_{obj._name}.json", "w")
+                file_path = new_path.replace("/", "-")
+                # print(f"   ---->[{new_path}]")
+
+                f = open(f"out/{owner_name}_{repo_name}_{branch_name}_{file_path}_{obj._name}.json", "w")
                 f.write(file_json)
                 f.close()
 
@@ -78,6 +83,7 @@ def parse_repo_branch_files(owner_name: str,
 
                 parse_repo_branch_files(
                     owner_name, repo_name, branch_name, new_path + obj._name)
+                delay_server()
             except Exception as e:
                 print(f"--sad--->{e}")
                 pass
@@ -93,19 +99,22 @@ print(__file__)
 owner_name = "ProductDevelopmentFirm"
 
 this_org = Organization.request(allspice, owner_name)
+delay_server()
 
 repo_list = this_org.get_repositories()
+delay_server()
 
 for repo in repo_list:
 
     branch_list = repo.get_branches()
+    delay_server()
     for branch in branch_list:
 
         try:
-            print("")
-            print("------------------------------------------------------------------")
-            print(f"--- Parsing: {owner_name}/{repo.name}/{branch.name} -------")
-            print("")
+            # print("")
+            # print("------------------------------------------------------------------")
+            # print(f"--- Parsing: {owner_name}/{repo.name}/{branch.name} -------")
+            # print("")
             foo = parse_repo_branch_files(owner_name, repo.name, branch.name)
 
         except TypeError:
