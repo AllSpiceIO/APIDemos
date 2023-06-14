@@ -7,7 +7,7 @@
 #
 # For more information read our README.md
 import os
-from gitea import *
+from allspice import *
 
 try:
     URL = os.environ['ALLSPICE_URL']
@@ -21,7 +21,7 @@ except:
     print("Token. Set environmental variables")
     print(">export ALLSPICE_ACCESS_TOKEN=\"YourAccessToken\"")
 
-allspice = Gitea(URL, TOKEN)
+allspice = AllSpice(URL, TOKEN)
 
 print("AllSpice Version: " + allspice.get_version())
 print("API-Token belongs to user: " + allspice.get_user().username)

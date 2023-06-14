@@ -1,19 +1,8 @@
 # get_repo_json.py
 
-# This function will be replaced by built-in rate limiting
-# https://github.com/AllSpiceIO/py-allspice/issues/6
 import os
 import json
-from gitea import *
-from time import sleep
-
-# Will remove when rate limiting is added to py-allspice
-# https://github.com/AllSpiceIO/py-allspice/issues/6
-
-
-def delay_server():
-    sleep(0.01)
-
+from allspice import AllSpice, Repository
 
 try:
     URL = os.environ['ALLSPICE_URL']
@@ -29,17 +18,23 @@ except KeyError:
     print(">export ALLSPICE_ACCESS_TOKEN=\"YourAccessToken\"")
     quit()
 
-allspice = Gitea(URL, TOKEN)
-delay_server()
+allspice = AllSpice(URL, TOKEN)
 
-# Replace with your owner, repo, and filename
-# /repos/repo_owner/repo_name/allspice_generated/json/filename
-file_url = "/repos/AllSpiceUser/ArchimajorFork/allspice_generated/json/Mosfets.SchDoc"
+repo: Repository = Repository.request(allspice, "AllSpiceUser", "ArchimajorFork")
 
-# Set branch / ref
-params = {"ref": "main"}
+# Replace with the path to the file from the root of the repo
+file_path = "Mosfets.SchDoc"
 
-file_dict = allspice.requests_get(file_url, params)
+# If you want the JSON for a specific commit or branch, get it from the repo object:
+ref = repo.get_branch("main")
+
+# You can also directly use a sha hash
+ref = "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+
+# Or a branch name
+ref = "main"
+
+file_dict = repo.get_generated_json(file_path, ref)
 
 # Example how to use dict
 # for key in file_dict:
