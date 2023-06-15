@@ -1,6 +1,6 @@
 # initialize.sh
 
-# Initializes director
+# Initializes directory
 
 Prepends project filenames with repo name. All *.prjpcb, *.schdoc, *.pcbdoc.
 
