@@ -18,25 +18,25 @@ Make sure you have the following prerequisites installed:
 1. Open a terminal or command prompt.
 
 2. Make the script executable if it isn't already by running the following command:
-    ```bash
+    ```
     chmod +x initialize.sh
     ```
 
 3a. To run the script without adding it to the path, use the full path to the script. 
 
 In this example the source script is here:
-``` bash
+``` 
  ~/Documents/git-demos/APIDemos/InitializeRepo/initialize.sh . 
 ```
 
 Change directory to your git directory. In this example this is our target git directory:
 
-``` bash
+``` 
  cd ~/Documents/git-demos/ArchimajorDemo
 ```
 
 Here is an example of the script being run on this ArchimajorDemo repo:
-``` BASH
+``` 
 danie@floorputer MINGW64 ~/Documents/git-demos/ArchimajorDemo (demo_feature)
 $ ~/Documents/git-demos/APIDemos/InitializeRepo/initialize.sh .
 Already up to date.
@@ -58,17 +58,17 @@ Modified: ./Archimajor.PcbDoc -> ./ArchimajorDemo_Archimajor.PcbDoc
 
 
 3b. If you would like to add the initialize script directory, then you need to add the command to your path.
-``` bash
+``` 
 export PATH=$PATH:"[path to directory]"
 ```
 
 Example path:
-``` bash
+``` 
 export PATH=$PATH:"C:\Users\danie\Documents\git-demos\APIDemos\InitializeRepo"
 ```
 
 4. The script can be run by passing it any directory, including ".", the current dir.
-```bash
+```
 ./initialize.sh git_directory
 ```
 Replace "git_directory" with your git project directory.
