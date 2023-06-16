@@ -12,11 +12,6 @@ fi
 # Store the directory argument
 directory="$1"
 
-if ! git pull > /dev/null 2>&1; then
-    echo "Not in a git repository, couldn't pull"
-fi
-
-
 suffixes=("schdoc" "prjpcb" "pcbdoc")  # Replace with your desired list of suffixes
 
 path=$(git rev-parse --show-toplevel) 
