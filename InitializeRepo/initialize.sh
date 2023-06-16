@@ -1,8 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-git pull
-
 # Check if a directory argument is provided
 if [ -z "$1" ]; then
   echo "Please provide a directory name as an argument."
@@ -15,6 +13,7 @@ directory="$1"
 suffixes=("schdoc" "prjpcb" "pcbdoc")  # Replace with your desired list of suffixes
 
 cd ${directory}
+git pull
 path=$(git rev-parse --show-toplevel) 
 
 reponame=$(basename "$path")
