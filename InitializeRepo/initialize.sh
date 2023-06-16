@@ -15,7 +15,6 @@ directory="$1"
 suffixes=("schdoc" "prjpcb" "pcbdoc")  # Replace with your desired list of suffixes
 
 cd ${directory}
-ls -la
 path=$(git rev-parse --show-toplevel) 
 
 reponame=$(basename "$path")
