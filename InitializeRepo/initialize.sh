@@ -23,7 +23,7 @@ reponame=$(basename "$path")
 for suffix in "${suffixes[@]}"; do
     # Find all files with .foo extension (case-insensitive) and loop through them
     find "${directory}" -type f -iname "*.${suffix}" | while read -r file; do
-    # Get the directory path and the base filename
+        # Get the directory path and the base filename
         dir_path=$(dirname "$file")
         base_name=$(basename "$file")
 
