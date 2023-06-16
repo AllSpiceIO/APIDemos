@@ -32,7 +32,7 @@ In this example the source script is here:
 Change directory to your git directory. In this example this is our target git directory:
 
 ``` bash
- ~/Documents/git-demos/ArchimajorDemo
+ cd ~/Documents/git-demos/ArchimajorDemo
 ```
 
 Here is an example of the script being run on this ArchimajorDemo repo:
