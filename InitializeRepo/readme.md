@@ -22,7 +22,7 @@ Make sure you have the following prerequisites installed:
     chmod +x initialize.sh
     ```
 
-3a. To run the scrip without adding it to the path, use the full path to the script. 
+3a. To run the script without adding it to the path, use the full path to the script. 
 
 In this example the source script is here:
 ``` bash
